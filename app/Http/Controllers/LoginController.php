@@ -47,6 +47,7 @@ class LoginController extends Controller
             $token = $this->jwt->fromUser($user);
             $data = [
                 'user_info' => [
+                    'id' => $user->id,
                     'name' => $user->name
                 ],
                 'token' => $token,
