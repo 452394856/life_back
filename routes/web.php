@@ -24,6 +24,7 @@ $api->version('v1', ['middleware' => ['cors']], function ($api) {
         $api->post('add', 'App\Http\Controllers\IndexController@add');
         $api->post('del', 'App\Http\Controllers\IndexController@del');
         $api->post('total', 'App\Http\Controllers\IndexController@total');
+        $api->post('edit_password', 'App\Http\Controllers\IndexController@editPassword');
     });
 
 });

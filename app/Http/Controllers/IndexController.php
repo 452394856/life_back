@@ -18,6 +18,7 @@ use const App\Service\Validate;
 use App\Model\PayUser;
 use Tymon\JWTAuth\JWTAuth;
 use DB;
+use Illuminate\Support\Facades\Hash;
 
 class IndexController extends Controller
 {
@@ -178,6 +179,38 @@ class IndexController extends Controller
         $reduce = round($pay - $consume, 2);
         $data = compact('consume', 'pay', 'reduce');
         return Result::success($data);
+
+    }
+
+    public function editPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'oldPassword' => 'required',
+            'newPassword' => 'required',
+            'ensurePassword' => 'required'
+        ], [
+            'oldPassword.required' => '旧密码不能为空',
+            'newPassword.required' => '新密码不能为空',
+            'ensurePassword.required' => '确认新密码不能为空',
+        ]);
+        if ($validator->fails()) {
+            return Result::error(Validate, $validator->messages());
+        }
+
+        if($request->get('newPassword') != $request->get('ensurePassword')){
+            return Result::error(-1, ['msg' => '新密码不一致']);
+        }
+
+        $user = $this->auth->parseToken()->authenticate();
+        $user->save() ;
+        if(!password_verify($request->get('oldPassword'), $user->password)){
+            return Result::error(-1, ['msg' => '旧密码错误']);
+        }else{
+            $user->password = Hash::make($request->get('newPassword'));
+            $user->save();
+            $this->auth->invalidate(); //删除当前token
+            return Result::success(['message' => '修改成功']);
+        }
 
     }
 }
