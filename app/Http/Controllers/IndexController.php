@@ -202,7 +202,6 @@ class IndexController extends Controller
         }
 
         $user = $this->auth->parseToken()->authenticate();
-        $user->save() ;
         if(!password_verify($request->get('oldPassword'), $user->password)){
             return Result::error(-1, ['msg' => '旧密码错误']);
         }else{
