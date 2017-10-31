@@ -32,13 +32,21 @@ class IndexController extends Controller
     public function getTab(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'time' => 'required|date_format:Y-m'
+            'time' => 'required'
         ], [
             'time.required' => '日期不能为空',
-            'time.date_format' => '日期格式不正确'
+//            'time.date_format' => '日期格式不正确'
         ]);
         if ($validator->fails()) {
             return Result::error(Validate, $validator->messages());
+        }
+        $date = date_create_from_format('Y-m-d', $request->get('time') . '-01');
+        if($date){
+                if($date->format('Y-m') != $request->get('time')){
+                    return Result::error(Validate, ['data' => ['time' => '日期格式不正确']]);
+                }
+        }else {
+            return Result::error(Validate, ['data' => ['time' => '日期格式不正确']]);
         }
 
         $time = '%' . $request->get('time') . '%';
@@ -150,13 +158,22 @@ class IndexController extends Controller
     public function total(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'time' => 'required|date_format:Y-m'
+            'time' => 'required'
         ], [
             'time.required' => '日期不能为空',
-            'time.date_format' => '日期格式不正确',
+//            'time.date_format' => '日期格式不正确',
         ]);
         if ($validator->fails()) {
             return Result::error(Validate, $validator->messages());
+        }
+
+        $date = date_create_from_format('Y-m-d', $request->get('time') . '-01');
+        if($date){
+            if($date->format('Y-m') != $request->get('time')){
+                return Result::error(Validate, ['data' => ['time' => '日期格式不正确']]);
+            }
+        }else {
+            return Result::error(Validate, ['data' => ['time' => '日期格式不正确']]);
         }
 
         $user = $this->auth->parseToken()->authenticate();
