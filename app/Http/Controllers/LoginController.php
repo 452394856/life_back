@@ -43,6 +43,11 @@ class LoginController extends Controller
         }
 
         $user = User::where('username', $request->get('username'))->first();
+
+        if(!$user){
+            return Result::error(-2, ['error' => '帐号错误']);
+        }
+
         if (password_verify($request->get('password'), $user->password)) {
             $token = $this->jwt->fromUser($user);
             $data = [
@@ -55,7 +60,7 @@ class LoginController extends Controller
             ];
             return Result::success($data);
         } else {
-            return Result::error(-2, ['error' => '帐号或密码错误']);
+            return Result::error(-2, ['error' => '密码错误']);
         }
     }
 }
